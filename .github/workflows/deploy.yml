@@ -65,8 +65,8 @@ jobs:
           port: ${{ secrets.EC2_PORT }}
 
           script: |
-            mkdir -p /home/ubuntu/github-actions-demo
-            echo "GitHub Actions SSH connection successful" > /home/ubuntu/github-actions-demo/status.txt
-            echo "File created at: $(date)" >> /home/ubuntu/github-actions-demo/status.txt
-
-            cat /home/ubuntu/github-actions-demo/status.txt
+           cd /home/ubuntu/mern-app-batch-215
+           docker compose down
+            docker compose up -d --build
+            docker ps -a
+            docker logs mern-app-frontend-1
