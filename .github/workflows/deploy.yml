@@ -1,6 +1,49 @@
-name: Save File Artifact
+# name: Save File Artifact
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   create-file:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
+
+#       - name: Create a file
+#         run: |
+#           mkdir -p output
+#           echo "Hello from GitHub Actions" > output/message.txt
+#           echo "This file is stored as an artifact." >> output/message.txt
+
+#       - name: Upload artifact
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: my-artifact
+#           path: output/message.txt
+
+#   download-and-read:
+#     runs-on: ubuntu-latest
+#     needs: create-file
+
+#     steps:
+#       - name: Download artifact
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: my-artifact
+#           path: downloaded
+
+#       - name: Read artifact file
+#         run: |
+#           echo "Reading artifact content:"
+#           cat downloaded/message.txt
+name: Create File on EC2
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -10,33 +53,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create a file
-        run: |
-          mkdir -p output
-          echo "Hello from GitHub Actions" > output/message.txt
-          echo "This file is stored as an artifact." >> output/message.txt
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Create file on EC2 using SSH
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          name: my-artifact
-          path: output/message.txt
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_PORT }}
 
-  download-and-read:
-    runs-on: ubuntu-latest
-    needs: create-file
+          script: |
+            mkdir -p /home/ubuntu/github-actions-demo
+            echo "GitHub Actions SSH connection successful" > /home/ubuntu/github-actions-demo/status.txt
+            echo "File created at: $(date)" >> /home/ubuntu/github-actions-demo/status.txt
 
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: my-artifact
-          path: downloaded
-
-      - name: Read artifact file
-        run: |
-          echo "Reading artifact content:"
-          cat downloaded/message.txt
+            cat /home/ubuntu/github-actions-demo/status.txt
