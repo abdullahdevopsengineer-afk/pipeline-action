@@ -40,7 +40,7 @@
 #         run: |
 #           echo "Reading artifact content:"
 #           cat downloaded/message.txt
-name: Create File on EC2
+name: docker compose deploy
 
 on:
   workflow_dispatch:
@@ -69,4 +69,4 @@ jobs:
            docker compose down
             docker compose up -d --build
             docker ps -a
-            docker logs mern-app-frontend-1
+            docker logs frontend
