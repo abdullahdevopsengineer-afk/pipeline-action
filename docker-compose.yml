@@ -1,0 +1,33 @@
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    ports:
+      - 27017:27017
+    networks:
+      - mern-network
+  backend:
+    build: ./server
+    container_name: backend
+    ports:
+      - 5000:5000
+    depends_on:
+      - mongodb
+    networks:
+      - mern-network
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    container_name: frontend
+    depends_on:
+      - backend
+    networks:
+      - mern-network
+volumes:
+  mongo-data:
+networks:
+  mern-network:
+    driver: bridge
